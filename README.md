@@ -1,4 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 三層數據架構實做
+
+核心概念
+三層數據架構分為：Server Components（初始數據獲取）、React Query（客戶端快取和更新）、Optimistic Updates（即時UI反饋） Robust Data Fetching Architecture For Complex React/Next.js Apps
+主要特色
+
+明確的檔案路徑 - 每個檔案都有完整的路徑說明
+步驟化實作 - 從建立專案到完成功能的詳細步驟
+繁體中文介面 - 所有 UI 文字都是繁體中文
+完整的 TypeScript 支援 - 包含型別定義和型別安全
+實用的功能 - 包含建立、刪除團隊的完整功能
+
+架構優勢
+
+避免常見問題 - 解決重複請求、狀態管理混亂、記憶體洩漏等問題
+優秀的使用者體驗 - 樂觀更新讓操作感覺即時
+良好的效能 - 伺服器端渲染結合客戶端快取
+可維護性 - 關注點分離，代碼結構清晰
+
+您可以按照指南中的步驟，從空專案開始逐步建立一個具有強大數據管理能力的 Next.js 應用程式。每個檔案都有完整的代碼範例和路徑說明，讓您可以直接複製使用。
 
 ## Getting Started
 
@@ -6,31 +25,11 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup Record
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npx create-next-app@latest my-data-app --typescript --tailwind --eslint --app
+npm install @tanstack/react-query @tanstack/react-query-devtools
+```
