@@ -1,11 +1,13 @@
-import { db } from '@/lib/db';
+import { apiDelete } from '@/lib/api';
+import { DeleteTeamResponse } from '@/types/api';
 
-export async function deleteTeamById(id: string): Promise<boolean> {
+export async function deleteTeamById(id: string): Promise<string> {
   try {
-    const result = await db.team.delete(id);
-    return result;
+    // 呼叫 Spring Boot API: DELETE /api/teams/{id}
+    const response = await apiDelete<DeleteTeamResponse>(`/teams/${id}`);
+    return response.deletedTeamId;
   } catch (error) {
     console.error('Failed to delete team:', error);
-    throw new Error('Failed to delete team');
+    throw new Error('無法刪除團隊');
   }
 }
