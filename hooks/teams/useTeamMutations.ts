@@ -8,7 +8,7 @@ export function useTeamMutations() {
   const queryClient = useQueryClient();
 
   const createTeamMutation = useMutation({
-    mutationFn: createTeam, // 使用查詢函數
+    mutationFn: createTeam,
     onMutate: async (newTeam) => {
       await queryClient.cancelQueries({ queryKey: ['teams'] });
       
@@ -87,9 +87,10 @@ export function useTeamMutations() {
   });
 
   const deleteTeamMutation = useMutation({
-    mutationFn: deleteTeamById, // 使用查詢函數
+    mutationFn: deleteTeamById,
     onMutate: async (teamId) => {
       await queryClient.cancelQueries({ queryKey: ['teams'] });
+      await queryClient.cancelQueries({ queryKey: ['team', teamId] });
       
       const currentTeams = queryClient.getQueryData<Team[]>(['teams']) || [];
       
@@ -97,7 +98,7 @@ export function useTeamMutations() {
         ['teams'],
         currentTeams.filter(team => team.id !== teamId)
       );
-      
+
       return { currentTeams };
     },
     onError: (err, teamId, context) => {
@@ -107,14 +108,13 @@ export function useTeamMutations() {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['teams'] });
-      queryClient.invalidateQueries({ queryKey: ['team'] });
     },
   });
 
   return {
-    createTeam: createTeamMutation.mutate,
+    createTeam: createTeamMutation.mutateAsync,
     updateTeam: updateTeamMutation.mutateAsync,
-    deleteTeam: deleteTeamMutation.mutate,
+    deleteTeam: deleteTeamMutation.mutateAsync,
     isCreating: createTeamMutation.isPending,
     isUpdating: updateTeamMutation.isPending,
     isDeleting: deleteTeamMutation.isPending,

@@ -13,7 +13,7 @@ export function TeamList() {
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamMembers, setNewTeamMembers] = useState('');
 
-  const handleCreateTeam = (e: React.FormEvent) => {
+  const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTeamName.trim()) return;
 
@@ -22,7 +22,7 @@ export function TeamList() {
       .map(member => member.trim())
       .filter(member => member.length > 0);
 
-    createTeam({
+    await createTeam({
       name: newTeamName.trim(),
       members,
     });
@@ -30,9 +30,13 @@ export function TeamList() {
     setNewTeamName('');
     setNewTeamMembers('');
   };
-
+  
   if (error) {
     return <ErrorState message="無法載入團隊資料" onRetry={refetch} />;
+  }
+
+  if (isLoadingTeams) {
+    return <LoadingState />;
   }
 
   return (

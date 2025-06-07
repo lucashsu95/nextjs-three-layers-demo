@@ -16,7 +16,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
     return (
       <main className="min-h-screen bg-gray-50">
         <div className="container mx-auto py-8">
-          <TeamDetail initialTeam={team} />
+          <TeamDetail teamId={teamId} initialTeam={team} />
         </div>
       </main>
     );

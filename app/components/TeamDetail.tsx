@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Team, CreateTeamRequest } from '@/types/team';
 import { useTeamDetail } from '@/hooks/teams/useTeamDetail';
 import { useTeamMutations } from '@/hooks/teams/useTeamMutations';
@@ -10,13 +10,12 @@ import { ErrorState } from '@/app/ui/error-state';
 import { TeamEditForm } from './TeamEditForm';
 
 interface TeamDetailProps {
+  teamId: string;
   initialTeam: Team;
 }
 
-export function TeamDetail({ initialTeam }: TeamDetailProps) {
-  const params = useParams();
+export function TeamDetail({ teamId, initialTeam }: TeamDetailProps) {
   const router = useRouter();
-  const teamId = params.teamId as string;
   
   const { data: team, isLoading, error, refetch } = useTeamDetail(teamId, initialTeam);
   const { updateTeam, deleteTeam, isUpdating, isDeleting } = useTeamMutations();
@@ -35,7 +34,7 @@ export function TeamDetail({ initialTeam }: TeamDetailProps) {
   const handleDelete = async () => {
     if (confirm('確定要刪除這個團隊嗎？')) {
       try {
-        deleteTeam(teamId);
+        await deleteTeam(teamId);
         router.push('/');
       } catch (error) {
         console.error('刪除失敗:', error);
