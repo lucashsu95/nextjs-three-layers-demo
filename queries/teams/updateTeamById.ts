@@ -4,7 +4,6 @@ import { TeamDetailResponse } from '@/types/api';
 
 export async function updateTeamById(id: string, data: CreateTeamRequest): Promise<Team> {
   try {
-    // 呼叫 Spring Boot API: PUT /api/teams/{id}
     const response = await apiPut<TeamDetailResponse>(`/teams/${id}`, data);
     return response.team;
   } catch (error) {

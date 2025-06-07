@@ -1,37 +1,19 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Team, CreateTeamRequest } from '@/types/team';
-import { apiPost, apiDelete } from '@/lib/api';
-import { CreateTeamResponse, DeleteTeamResponse } from '@/types/api';
+import { createTeam } from '@/queries/teams/createTeam';
+import { updateTeamById } from '@/queries/teams/updateTeamById';
+import { deleteTeamById } from '@/queries/teams/deleteTeamById';
 
 export function useTeamMutations() {
   const queryClient = useQueryClient();
 
   const createTeamMutation = useMutation({
-    mutationFn: async (newTeam: CreateTeamRequest): Promise<Team> => {
-      // 選項1: 直接呼叫 Spring Boot API
-      const response = await apiPost<CreateTeamResponse>('/teams', newTeam);
-      return response.team;
-      
-      // 選項2: 透過 Next.js API 路由 (如果您選擇使用代理層)
-      // const response = await fetch('/api/teams', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(newTeam),
-      // });
-      // const apiResponse = await response.json();
-      // if (!apiResponse.result) {
-      //   throw new Error(apiResponse.message);
-      // }
-      // return apiResponse.data.team;
-    },
+    mutationFn: createTeam, // 使用查詢函數
     onMutate: async (newTeam) => {
-      // 取消任何進行中的查詢
       await queryClient.cancelQueries({ queryKey: ['teams'] });
       
-      // 獲取當前數據
       const currentTeams = queryClient.getQueryData<Team[]>(['teams']) || [];
       
-      // 樂觀更新
       const optimisticTeam: Team = {
         ...newTeam,
         id: `temp-${Date.now()}`,
@@ -44,39 +26,73 @@ export function useTeamMutations() {
       return { currentTeams };
     },
     onError: (err, variables, context) => {
-      // 發生錯誤時回滾
       if (context?.currentTeams) {
         queryClient.setQueryData(['teams'], context.currentTeams);
       }
     },
     onSettled: () => {
-      // 重新驗證數據
       queryClient.invalidateQueries({ queryKey: ['teams'] });
     },
   });
 
-  const deleteTeamMutation = useMutation({
-    mutationFn: async (teamId: string): Promise<string> => {
-      // 選項1: 直接呼叫 Spring Boot API
-      const response = await apiDelete<DeleteTeamResponse>(`/teams/${teamId}`);
-      return response.deletedTeamId;
+  const updateTeamMutation = useMutation({
+    mutationFn: ({ teamId, data }: { teamId: string; data: CreateTeamRequest }) => 
+      updateTeamById(teamId, data),
+    onMutate: async ({ teamId, data }) => {
+      await queryClient.cancelQueries({ queryKey: ['teams'] });
+      await queryClient.cancelQueries({ queryKey: ['team', teamId] });
       
-      // 選項2: 透過 Next.js API 路由 (如果您選擇使用代理層)
-      // const response = await fetch(`/api/teams/${teamId}`, {
-      //   method: 'DELETE',
-      // });
-      // const apiResponse = await response.json();
-      // if (!apiResponse.result) {
-      //   throw new Error(apiResponse.message);
-      // }
-      // return apiResponse.data.deletedTeamId;
+      // 取得目前快取中的團隊列表。如果沒有資料，則預設為空陣列。
+      const currentTeams = queryClient.getQueryData<Team[]>(['teams']) || [];
+      // 取得目前快取中的單一團隊資料。如果沒有資料，則為 `undefined`。
+      const currentTeam = queryClient.getQueryData<Team>(['team', teamId]);
+      
+      // 建立一個新的團隊列表。如果團隊的 `id` 等於 `teamId`，就用新資料（`data`）和當前時間（`updatedAt`）更新該團隊；否則保持原樣。
+      const updatedTeams = currentTeams.map(team => 
+        team.id === teamId 
+          ? { 
+              ...team, 
+              ...data, 
+              updatedAt: new Date() 
+            }
+          : team
+      );
+      queryClient.setQueryData<Team[]>(['teams'], updatedTeams);
+      // 將更新後的 團隊列表 寫回快取，讓 UI 立即反映變更（樂觀更新）。
+      
+      if (currentTeam) {
+        const updatedTeam = { 
+          ...currentTeam, 
+          ...data, 
+          updatedAt: new Date() 
+        };
+        queryClient.setQueryData(['team', teamId], updatedTeam);
+        // 如果有該 團隊 的快取資料，則用新資料和當前時間更新該團隊，並寫回快取。
+      }
+      
+      return { currentTeams, currentTeam };
     },
+    onError: (err, { teamId }, context) => {
+      if (context?.currentTeams) {
+        queryClient.setQueryData(['teams'], context.currentTeams);
+      }
+      if (context?.currentTeam) {
+        queryClient.setQueryData(['team', teamId], context.currentTeam);
+      }
+    },
+    onSettled: (data, error, { teamId }) => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['team', teamId] });
+    },
+  });
+
+  const deleteTeamMutation = useMutation({
+    mutationFn: deleteTeamById, // 使用查詢函數
     onMutate: async (teamId) => {
       await queryClient.cancelQueries({ queryKey: ['teams'] });
       
       const currentTeams = queryClient.getQueryData<Team[]>(['teams']) || [];
       
-      // 樂觀刪除
       queryClient.setQueryData<Team[]>(
         ['teams'],
         currentTeams.filter(team => team.id !== teamId)
@@ -97,10 +113,13 @@ export function useTeamMutations() {
 
   return {
     createTeam: createTeamMutation.mutate,
+    updateTeam: updateTeamMutation.mutateAsync,
     deleteTeam: deleteTeamMutation.mutate,
     isCreating: createTeamMutation.isPending,
+    isUpdating: updateTeamMutation.isPending,
     isDeleting: deleteTeamMutation.isPending,
     createError: createTeamMutation.error,
+    updateError: updateTeamMutation.error,
     deleteError: deleteTeamMutation.error,
   };
 }

@@ -4,7 +4,6 @@ import { TeamsListResponse } from '@/types/api';
 
 export async function getAllTeams(): Promise<Team[]> {
   try {
-    // 呼叫 Spring Boot API: GET /api/teams
     const response = await apiGet<TeamsListResponse>('/teams');
     return response.teams;
   } catch (error) {

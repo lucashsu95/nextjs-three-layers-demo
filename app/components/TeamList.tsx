@@ -49,7 +49,7 @@ export function TeamList() {
               type="text"
               value={newTeamName}
               onChange={(e) => setNewTeamName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
               placeholder="輸入團隊名稱"
               required
             />
@@ -63,7 +63,7 @@ export function TeamList() {
               type="text"
               value={newTeamMembers}
               onChange={(e) => setNewTeamMembers(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
               placeholder="張三, 李四, 王五"
             />
           </div>
