@@ -6,21 +6,12 @@
 
 ## 架構概述
 
-三層數據架構包含：
 1. **第一層：Server Components** - 初始數據獲取
 2. **第二層：React Query** - 客戶端快取和更新
 3. **第三層：Optimistic Updates** - 即時UI反饋
 
-
 ## 核心概念
 三層數據架構分為：Server Components（初始數據獲取）、React Query（客戶端快取和更新）、Optimistic Updates（即時UI反饋） Robust Data Fetching Architecture For Complex React/Next.js Apps
-
-## 主要特色
-- 明確的檔案路徑 - 每個檔案都有完整的路徑說明
-- 步驟化實作 - 從建立專案到完成功能的詳細步驟
-- 繁體中文介面 - 所有 UI 文字都是繁體中文
-- 完整的 TypeScript 支援 - 包含型別定義和型別安全
-- 實用的功能 - 包含建立、刪除團隊的完整功能
 
 ## 架構優勢
 - 避免常見問題 - 解決重複請求、狀態管理混亂、記憶體洩漏等問題
@@ -31,8 +22,11 @@
 ## Getting Started
 
 ```bash
+npm i
 npm run dev
 ```
+
+後端可以使用[teams-api-backend-practise](https://github.com/lucashsu95/teams-api-backend-practise)
 
 ## Setup Record
 
